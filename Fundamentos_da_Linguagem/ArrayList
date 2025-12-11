@@ -74,3 +74,54 @@ Nome: Ana | Carro: Civic
 Nome: Carlos | Carro: Gol
 
 
+
+
+================================================================================
+# Remover pelo índice 
+================================================================================
+
+motoristas.remove(0);  // remove o primeiro motorista da list
+
+
+
+
+================================================================================
+# Remover pelo objeto
+================================================================================
+
+Motorista m = new Motorista("Marcos", "Peugeot");
+motoristas.remove(m);
+
+
+
+
+================================================================================
+# Remover procurando pelo nome
+================================================================================
+
+String nomeProcurado = "Ana";
+
+motoristas.removeIf(m -> m.getNome().equalsIgnoreCase(nomeProcurado));
+
+
+
+================================================================================
+# Procurar por um motorista específico 
+================================================================================
+
+String nomeProcurado = "Carlos";
+Motorista encontrado = null;
+
+for (Motorista m : motoristas) {
+    if (m.getNome().equalsIgnoreCase(nomeProcurado)) {
+        encontrado = m;
+        break;
+    }
+}
+
+if (encontrado != null) {
+    System.out.println("Motorista encontrado: " + encontrado);
+} else {
+    System.out.println("Motorista não encontrado.");
+}
+
