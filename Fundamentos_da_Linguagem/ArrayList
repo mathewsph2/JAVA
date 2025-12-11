@@ -1,0 +1,76 @@
+================================================================================
+# Classe Motorista (simples)
+================================================================================
+
+public class Motorista {
+
+    private String nome;
+    private String carro;
+
+    public Motorista(String nome, String carro) {
+        this.nome = nome;
+        this.carro = carro;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getCarro() {
+        return carro;
+    }
+
+    @Override
+    public String toString() {
+        return nome + " dirige " + carro;
+    }
+}
+
+
+
+
+================================================================================
+# Classe TesteObjetos
+================================================================================
+
+import java.util.ArrayList;
+
+public class TesteObjetos {
+    public static void main(String[] args) {
+
+        // Criando o ArrayList de Motorista
+        ArrayList<Motorista> motoristas = new ArrayList<>();
+
+        // Adicionando objetos Motorista
+        motoristas.add(new Motorista("Marcos", "Peugeot"));
+        motoristas.add(new Motorista("Ana", "Civic"));
+        motoristas.add(new Motorista("Carlos", "Gol"));
+
+        // Exibindo toda a lista
+        System.out.println("Lista de Motoristas:");
+        System.out.println(motoristas);
+
+        // Percorrendo item por item
+        System.out.println("\nExibindo cada motorista:");
+        for (Motorista m : motoristas) {
+            System.out.println("Nome: " + m.getNome() + " | Carro: " + m.getCarro());
+        }
+    }
+}
+
+
+
+
+================================================================================
+# Saída Esperada
+================================================================================
+
+Lista de Motoristas:
+[Marcos dirige Peugeot, Ana dirige Civic, Carlos dirige Gol]
+
+Exibindo cada motorista:
+Nome: Marcos | Carro: Peugeot
+Nome: Ana | Carro: Civic
+Nome: Carlos | Carro: Gol
+
+
