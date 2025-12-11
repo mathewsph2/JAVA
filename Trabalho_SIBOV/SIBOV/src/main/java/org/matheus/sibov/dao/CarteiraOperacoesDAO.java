@@ -243,6 +243,62 @@ public List<String> listarAtivosPorUsuario(int idUsuario) {
     return ativos;
 }
 
+
+
+/* ------------------------------------------------------------------------
+ * Listar Operações por nome do usuários para o ComboBox da tela VisaoAdmLogsDeOperacoes.java
+ * ------------------------------------------------------------------------ */
+
+public List<Object[]> listarOperacoesPorNomeUsuario(String nomeUsuario) {
+    List<Object[]> lista = new ArrayList<>();
+
+    String sql = "SELECT o.id, o.id_usuario, o.id_ativo, u.nome AS usuario, a.ticker AS ativo, c.nome AS corretora, "
+               + "o.tipo_operacao, o.valor_operacao, o.quantidade, o.valor_unitario, "
+               + "o.valor_total, o.data_operacao, o.observacoes, o.saldo_apos "
+               + "FROM carteira_operacoes o "
+               + "JOIN usuarios u ON o.id_usuario = u.id "
+               + "LEFT JOIN ativo a ON o.id_ativo = a.id "
+               + "LEFT JOIN corretoras c ON o.id_corretora = c.id "
+               + "WHERE u.nome = ? "
+               + "ORDER BY o.data_operacao DESC, o.id DESC";
+
+    try (Connection conn = ConnectionFactory.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        stmt.setString(1, nomeUsuario);
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Object[] linha = new Object[14];
+                linha[0] = rs.getLong("id");
+                linha[1] = rs.getInt("id_usuario");
+                linha[2] = rs.getInt("id_ativo");
+                linha[3] = rs.getString("usuario");
+                linha[4] = rs.getString("ativo");
+                linha[5] = rs.getString("corretora");
+                linha[6] = rs.getString("tipo_operacao");
+                linha[7] = rs.getBigDecimal("valor_operacao");
+                linha[8] = rs.getInt("quantidade");
+                linha[9] = rs.getBigDecimal("valor_unitario");
+                linha[10] = rs.getBigDecimal("valor_total");
+                linha[11] = rs.getTimestamp("data_operacao");
+                linha[12] = rs.getString("observacoes");
+                linha[13] = rs.getBigDecimal("saldo_apos");
+                lista.add(linha);
+            }
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Erro ao listar operações do usuário: " + e.getMessage());
+    }
+
+    return lista;
+}
+
+
+
+
+
     
 
 
@@ -274,6 +330,33 @@ public List<String> listarTiposOperacaoPorUsuario(int idUsuario) {
 
     return tipos;
 }
+
+
+
+/* ------------------------------------------------------------------------
+ * Listar Nome dos usuários para o ComboBox da tela VisaoAdmLogsDeOperacoes.java
+ * ------------------------------------------------------------------------ */
+public List<String> listarUsuarios() {
+    List<String> usuarios = new ArrayList<>();
+    String sql = "SELECT nome FROM usuarios ORDER BY nome";
+
+    try (Connection conn = ConnectionFactory.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+
+        while (rs.next()) {
+            usuarios.add(rs.getString("nome"));
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Erro ao listar usuários: " + e.getMessage());
+    }
+
+    return usuarios;
+}
+
+
+
 
     
 }

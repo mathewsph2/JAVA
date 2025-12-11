@@ -281,6 +281,8 @@ public class VisaoAdministradorEventoProcessado extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        getAccessibleContext().setAccessibleName("Eventos Processados | SIBOV");
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 

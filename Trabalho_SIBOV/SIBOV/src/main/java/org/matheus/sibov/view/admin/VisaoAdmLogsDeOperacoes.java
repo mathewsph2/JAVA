@@ -30,12 +30,18 @@ public class VisaoAdmLogsDeOperacoes extends javax.swing.JFrame {
 
     public VisaoAdmLogsDeOperacoes() {
         initComponents();
+        
+        carregarUsuariosNoComboBox();
+        adicionarListenerComboBox();
     }
 
     public VisaoAdmLogsDeOperacoes(Usuario user) {
         this.usuarioLogado = user;
         initComponents();
+        
         carregarDadosUsuario();
+         carregarUsuariosNoComboBox(); // população o combo
+         adicionarListenerComboBox();  //  O listener para o Combo
     }
 
     private void carregarDadosUsuario() {
@@ -43,6 +49,72 @@ public class VisaoAdmLogsDeOperacoes extends javax.swing.JFrame {
             txtUsuarioLogado.setText(usuarioLogado.getNome());
         }
     }
+    
+    
+ 
+    /* ------------------------------------------------------------------------
+ * Método do Listener 
+ * ------------------------------------------------------------------------ */
+    
+  private void adicionarListenerComboBox() {
+    ComboBoxUsuarios.addActionListener(evt -> {
+        String usuarioSelecionado = (String) ComboBoxUsuarios.getSelectedItem();
+        if (usuarioSelecionado != null) {
+            if ("Todos".equals(usuarioSelecionado)) {
+                carregarTabelaOperacoes(); // mostra todas
+            } else {
+                carregarTabelaOperacoesPorUsuario(usuarioSelecionado); // mostra filtrado
+            }
+        }
+    });
+}
+  
+     
+    
+ /* ------------------------------------------------------------------------
+ * Popular o ComboBox na tela
+ * ------------------------------------------------------------------------ */
+    
+    private void carregarUsuariosNoComboBox() {
+    CarteiraOperacoesDAO dao = new CarteiraOperacoesDAO();
+    List<String> usuarios = dao.listarUsuarios();
+
+    ComboBoxUsuarios.removeAllItems();
+    ComboBoxUsuarios.addItem("Todos"); // opção especial
+
+    for (String usuario : usuarios) {
+        ComboBoxUsuarios.addItem(usuario);
+    }
+}
+    
+    
+
+    /* ------------------------------------------------------------------------
+ * Método para carregar tabela filtrada
+ * ------------------------------------------------------------------------ */
+    
+  private void carregarTabelaOperacoesPorUsuario(String nomeUsuario) {
+    CarteiraOperacoesDAO dao = new CarteiraOperacoesDAO();
+    List<Object[]> lista = dao.listarOperacoesPorNomeUsuario(nomeUsuario);
+
+    String[] colunas = {
+        "ID Operação", "ID Usuário", "ID Ativo", "Usuário", "Ativo", "Corretora",
+        "Tipo Operação", "Valor Operação", "Quantidade", "Valor Unitário",
+        "Valor Total", "Data Operação", "Observações", "Saldo Após"
+    };
+
+    javax.swing.table.DefaultTableModel modelo =
+        new javax.swing.table.DefaultTableModel(colunas, 0);
+
+    for (Object[] linha : lista) {
+        modelo.addRow(linha);
+    }
+
+    TabelaOperacoesLogs.setModel(modelo);
+}
+
+
+    
     
     
     
@@ -125,6 +197,8 @@ public class VisaoAdmLogsDeOperacoes extends javax.swing.JFrame {
         txtUsuarioLogado = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         TabelaOperacoesLogs = new javax.swing.JTable();
+        jLabel2 = new javax.swing.JLabel();
+        ComboBoxUsuarios = new javax.swing.JComboBox<>();
         jMenuBar1 = new javax.swing.JMenuBar();
         BtnCadastro = new javax.swing.JMenu();
         btnCadastrarAtivos = new javax.swing.JMenuItem();
@@ -135,6 +209,8 @@ public class VisaoAdmLogsDeOperacoes extends javax.swing.JFrame {
         LogOperacoesCarteira = new javax.swing.JMenuItem();
         MenuItemEstorno = new javax.swing.JMenuItem();
         btnRelatorios = new javax.swing.JMenu();
+        MenuItemHistoricoDeOperacoes = new javax.swing.JMenuItem();
+        MenuItemEventosProcessados = new javax.swing.JMenuItem();
         btnSair = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -206,6 +282,11 @@ public class VisaoAdmLogsDeOperacoes extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(TabelaOperacoesLogs);
 
+        jLabel2.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel2.setText("Filtrar por Usuário:");
+
+        ComboBoxUsuarios.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
         jMenuBar1.setBackground(new java.awt.Color(153, 153, 153));
 
         BtnCadastro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/matheus/images/novo.png"))); // NOI18N
@@ -273,6 +354,23 @@ public class VisaoAdmLogsDeOperacoes extends javax.swing.JFrame {
 
         btnRelatorios.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/matheus/images/calendario.png"))); // NOI18N
         btnRelatorios.setText("Relatórios");
+
+        MenuItemHistoricoDeOperacoes.setText("Historico de Operacoes");
+        MenuItemHistoricoDeOperacoes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuItemHistoricoDeOperacoesActionPerformed(evt);
+            }
+        });
+        btnRelatorios.add(MenuItemHistoricoDeOperacoes);
+
+        MenuItemEventosProcessados.setText("Eventos Processados");
+        MenuItemEventosProcessados.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuItemEventosProcessadosActionPerformed(evt);
+            }
+        });
+        btnRelatorios.add(MenuItemEventosProcessados);
+
         jMenuBar1.add(btnRelatorios);
 
         btnSair.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/matheus/images/sair.png"))); // NOI18N
@@ -293,16 +391,28 @@ public class VisaoAdmLogsDeOperacoes extends javax.swing.JFrame {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1207, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(108, 108, 108)
+                .addComponent(jLabel2)
+                .addGap(18, 18, 18)
+                .addComponent(ComboBoxUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(ComboBoxUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
+
+        getAccessibleContext().setAccessibleName("Historico de Operacoes | SIBOV");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -381,6 +491,16 @@ public class VisaoAdmLogsDeOperacoes extends javax.swing.JFrame {
         this.dispose(); 
     }//GEN-LAST:event_MenuItemEstornoActionPerformed
 
+    private void MenuItemHistoricoDeOperacoesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItemHistoricoDeOperacoesActionPerformed
+         new VisaoAdmLogsDeOperacoes().setVisible(true);
+           this.dispose(); 
+    }//GEN-LAST:event_MenuItemHistoricoDeOperacoesActionPerformed
+
+    private void MenuItemEventosProcessadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItemEventosProcessadosActionPerformed
+        new VisaoAdministradorEventoProcessado().setVisible(true);
+        this.dispose(); 
+    }//GEN-LAST:event_MenuItemEventosProcessadosActionPerformed
+
     
     
     /**
@@ -411,9 +531,12 @@ public class VisaoAdmLogsDeOperacoes extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu BtnCadastro;
     private javax.swing.JMenu BtnControle;
+    private javax.swing.JComboBox<String> ComboBoxUsuarios;
     private javax.swing.JMenuItem LogOperacoesCarteira;
     private javax.swing.JLabel Logado;
     private javax.swing.JMenuItem MenuItemEstorno;
+    private javax.swing.JMenuItem MenuItemEventosProcessados;
+    private javax.swing.JMenuItem MenuItemHistoricoDeOperacoes;
     private javax.swing.JMenuItem MenuItemProvento;
     private javax.swing.JTable TabelaOperacoesLogs;
     private javax.swing.JMenuItem btnCadastrarAtivos;
@@ -421,6 +544,7 @@ public class VisaoAdmLogsDeOperacoes extends javax.swing.JFrame {
     private javax.swing.JMenu btnRelatorios;
     private javax.swing.JMenu btnSair;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;

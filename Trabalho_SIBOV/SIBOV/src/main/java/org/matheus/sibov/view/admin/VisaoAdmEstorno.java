@@ -29,12 +29,19 @@ public class VisaoAdmEstorno extends javax.swing.JFrame {
 
     public VisaoAdmEstorno() {
         initComponents();
+        
+         carregarUsuariosNoComboBox();
+        adicionarListenerComboBox();
+        
     }
 
     public VisaoAdmEstorno(Usuario user) {
         this.usuarioLogado = user;
         initComponents();
         carregarDadosUsuario();
+        
+        carregarUsuariosNoComboBox();
+        adicionarListenerComboBox();
     }
 
     private void carregarDadosUsuario() {
@@ -42,6 +49,78 @@ public class VisaoAdmEstorno extends javax.swing.JFrame {
             txtUsuarioLogado.setText(usuarioLogado.getNome());
         }
     }
+    
+    
+    
+    
+     /* ---------------------------------------------------------------------------- */
+// método para popular o comboBox
+/* ---------------------------------------------------------------------------- */
+    
+    private void carregarUsuariosNoComboBox() {
+    CarteiraOperacoesDAO dao = new CarteiraOperacoesDAO();
+    List<String> usuarios = dao.listarUsuarios();
+
+    ComboBoxUsuarios.removeAllItems();
+    ComboBoxUsuarios.addItem("Todos"); // opção especial
+
+    for (String usuario : usuarios) {
+        ComboBoxUsuarios.addItem(usuario);
+    }
+}
+    
+    
+      /* ---------------------------------------------------------------------------- */
+// Listener no ComboBox
+/* ---------------------------------------------------------------------------- */
+    
+    private void adicionarListenerComboBox() {
+    ComboBoxUsuarios.addActionListener(evt -> {
+        String usuarioSelecionado = (String) ComboBoxUsuarios.getSelectedItem();
+        if (usuarioSelecionado != null) {
+            if ("Todos".equals(usuarioSelecionado)) {
+                carregarTabelaOperacoes(); // mostra todas
+            } else {
+                carregarTabelaOperacoesPorUsuario(usuarioSelecionado); // mostra filtrado
+            }
+        }
+    });
+}
+
+    
+    
+    
+    
+    
+    
+     /* ---------------------------------------------------------------------------- */
+// método para método para carregar operações filtradas
+/* ---------------------------------------------------------------------------- */
+    
+    private void carregarTabelaOperacoesPorUsuario(String nomeUsuario) {
+    CarteiraOperacoesDAO dao = new CarteiraOperacoesDAO();
+    List<Object[]> lista = dao.listarOperacoesPorNomeUsuario(nomeUsuario);
+
+    String[] colunas = {
+        "ID Operação", "ID Usuário", "ID Ativo", "Usuário", "Ativo", "Corretora",
+        "Tipo Operação", "Valor Operação", "Quantidade", "Valor Unitário",
+        "Valor Total", "Data Operação", "Observações", "Saldo Após"
+    };
+
+    javax.swing.table.DefaultTableModel modelo =
+        new javax.swing.table.DefaultTableModel(colunas, 0);
+
+    for (Object[] linha : lista) {
+        modelo.addRow(linha);
+    }
+
+    TabelaOperacoesEstornos.setModel(modelo);
+}
+
+
+    
+    
+    
 
     /* ---------------------------------------------------------------------------- */
 // método para carregar a tabela
@@ -121,6 +200,8 @@ public class VisaoAdmEstorno extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         TabelaOperacoesEstornos = new javax.swing.JTable();
         BtnEstornoDeOperacao = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        ComboBoxUsuarios = new javax.swing.JComboBox<>();
         jMenuBar1 = new javax.swing.JMenuBar();
         BtnCadastro = new javax.swing.JMenu();
         btnCadastrarAtivos = new javax.swing.JMenuItem();
@@ -131,10 +212,12 @@ public class VisaoAdmEstorno extends javax.swing.JFrame {
         MenuItemLogs = new javax.swing.JMenuItem();
         MenuItemEstorno = new javax.swing.JMenuItem();
         btnRelatorios = new javax.swing.JMenu();
+        MenuItemHistoricoDeOperacoes = new javax.swing.JMenuItem();
+        MenuItemEventosProcessados = new javax.swing.JMenuItem();
         btnSair = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Painel administrativo do sistema financeiro SIBOV");
+        setTitle("Estorno de Operacoes | SIBOV ");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowActivated(java.awt.event.WindowEvent evt) {
                 formWindowActivated(evt);
@@ -210,6 +293,11 @@ public class VisaoAdmEstorno extends javax.swing.JFrame {
             }
         });
 
+        jLabel2.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel2.setText("Filtrar por usuário:");
+
+        ComboBoxUsuarios.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
         jMenuBar1.setBackground(new java.awt.Color(153, 153, 153));
 
         BtnCadastro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/matheus/images/novo.png"))); // NOI18N
@@ -277,6 +365,23 @@ public class VisaoAdmEstorno extends javax.swing.JFrame {
 
         btnRelatorios.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/matheus/images/calendario.png"))); // NOI18N
         btnRelatorios.setText("Relatórios");
+
+        MenuItemHistoricoDeOperacoes.setText("Historico de Operacoes");
+        MenuItemHistoricoDeOperacoes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuItemHistoricoDeOperacoesActionPerformed(evt);
+            }
+        });
+        btnRelatorios.add(MenuItemHistoricoDeOperacoes);
+
+        MenuItemEventosProcessados.setText("Eventos Processados");
+        MenuItemEventosProcessados.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuItemEventosProcessadosActionPerformed(evt);
+            }
+        });
+        btnRelatorios.add(MenuItemEventosProcessados);
+
         jMenuBar1.add(btnRelatorios);
 
         btnSair.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/matheus/images/sair.png"))); // NOI18N
@@ -297,20 +402,30 @@ public class VisaoAdmEstorno extends javax.swing.JFrame {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1207, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(130, 130, 130)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(ComboBoxUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(BtnEstornoDeOperacao, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18))
+                .addGap(16, 16, 16))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(ComboBoxUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 446, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(BtnEstornoDeOperacao, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -391,6 +506,16 @@ public class VisaoAdmEstorno extends javax.swing.JFrame {
         this.dispose(); 
     }//GEN-LAST:event_MenuItemEstornoActionPerformed
 
+    private void MenuItemEventosProcessadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItemEventosProcessadosActionPerformed
+        new VisaoAdministradorEventoProcessado().setVisible(true);
+        this.dispose(); 
+    }//GEN-LAST:event_MenuItemEventosProcessadosActionPerformed
+
+    private void MenuItemHistoricoDeOperacoesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItemHistoricoDeOperacoesActionPerformed
+           new VisaoAdmLogsDeOperacoes().setVisible(true);
+           this.dispose(); 
+    }//GEN-LAST:event_MenuItemHistoricoDeOperacoesActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -420,8 +545,11 @@ public class VisaoAdmEstorno extends javax.swing.JFrame {
     private javax.swing.JMenu BtnCadastro;
     private javax.swing.JMenu BtnControle;
     private javax.swing.JButton BtnEstornoDeOperacao;
+    private javax.swing.JComboBox<String> ComboBoxUsuarios;
     private javax.swing.JLabel Logado;
     private javax.swing.JMenuItem MenuItemEstorno;
+    private javax.swing.JMenuItem MenuItemEventosProcessados;
+    private javax.swing.JMenuItem MenuItemHistoricoDeOperacoes;
     private javax.swing.JMenuItem MenuItemLogs;
     private javax.swing.JMenuItem MenuItemProvento;
     private javax.swing.JTable TabelaOperacoesEstornos;
@@ -430,6 +558,7 @@ public class VisaoAdmEstorno extends javax.swing.JFrame {
     private javax.swing.JMenu btnRelatorios;
     private javax.swing.JMenu btnSair;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;

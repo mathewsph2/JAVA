@@ -120,7 +120,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
-    <Property name="title" type="java.lang.String" value="Painel administrativo do sistema financeiro SIBOV"/>
+    <Property name="title" type="java.lang.String" value="Administrador - SIBOV"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="menuBar" type="java.lang.String" value="jMenuBar1"/>

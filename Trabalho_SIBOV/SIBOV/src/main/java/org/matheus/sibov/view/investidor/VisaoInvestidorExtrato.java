@@ -454,6 +454,8 @@ private void carregarTabelaOperacoes() {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
+        getAccessibleContext().setAccessibleName("Extrato do Investidor | Sistema financeiro SIBOV");
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 

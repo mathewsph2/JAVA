@@ -421,6 +421,8 @@ public class VisaoAdmCadastroUsers extends javax.swing.JFrame {
 
         layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {BtnEditar, BtnExcluir, BtnSalvar});
 
+        getAccessibleContext().setAccessibleName("Cadastro de Usuarios  | SIBOV");
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 

@@ -526,6 +526,8 @@ public class VisaoInvestidorCorretagem extends javax.swing.JFrame {
                 .addComponent(PainelVerdeInferior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
+        getAccessibleContext().setAccessibleName("Taxas de Corretagem por corretora - Sistema financeiro SIBOV");
+
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents

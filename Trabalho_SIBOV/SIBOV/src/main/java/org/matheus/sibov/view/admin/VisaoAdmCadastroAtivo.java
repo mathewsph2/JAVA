@@ -386,6 +386,8 @@ public class VisaoAdmCadastroAtivo extends javax.swing.JFrame {
 
         layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {BtnEditar, BtnExcluir, BtnInserir});
 
+        getAccessibleContext().setAccessibleName("Cadastro de Ativos | SIBOV ");
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 

@@ -438,6 +438,8 @@ public class VisaoAdmCadastroDeCorretoras extends javax.swing.JFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
+        getAccessibleContext().setAccessibleName("Cadastro de Corretoras | SIBOV");
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 

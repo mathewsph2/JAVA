@@ -625,6 +625,8 @@ public class VisaoInvestidorCompraAtivo extends javax.swing.JFrame {
 
         layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {BtnVendaDeAtivo, btnComprarAtivo});
 
+        getAccessibleContext().setAccessibleName("Compra de Ativos - Sistema financeiro SIBOV");
+
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents

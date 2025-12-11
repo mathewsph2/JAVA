@@ -409,6 +409,8 @@ public class VisaoInvestidorProventosPagos extends javax.swing.JFrame {
                 .addComponent(PainelVerdeInferior, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
+        getAccessibleContext().setAccessibleName("Proventos Pagos - Sistema financeiro SIBOV");
+
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
