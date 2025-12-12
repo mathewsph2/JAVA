@@ -24,7 +24,7 @@ import org.matheus.sibov.service.UsuarioService;
 public class VisaoAdmCadastroUsers extends javax.swing.JFrame {
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VisaoAdmCadastroUsers.class.getName());
-    private UsuarioService usuarioService = new UsuarioService(); // <-- CORRETO
+    private UsuarioService usuarioService = new UsuarioService(); 
 
     /**
      * Creates new form VisaoAdministrador
@@ -80,7 +80,18 @@ public class VisaoAdmCadastroUsers extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         RadioButton01 = new javax.swing.JRadioButton();
         RadioButton02 = new javax.swing.JRadioButton();
-        txtCpf = new javax.swing.JTextField();
+        // txtCpf = new javax.swing.JTextField();
+
+        // Máscara de configuração de CPF:
+        try {
+            javax.swing.text.MaskFormatter cpfMask = new javax.swing.text.MaskFormatter("###.###.###-##");
+            cpfMask.setPlaceholderCharacter('_'); // opcional, mostra "_" nos espaços vazios
+            txtCpf = new javax.swing.JFormattedTextField(cpfMask);
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+
+
         txtEmail = new javax.swing.JTextField();
         txtNome = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();

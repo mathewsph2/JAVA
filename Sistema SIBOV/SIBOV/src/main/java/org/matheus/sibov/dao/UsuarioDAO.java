@@ -1,5 +1,12 @@
 /* ---------------------------------------------------------------------------- */
 // Operaçãoes relacionadas ao usuário: Insert, updade, delete, select 
+//
+// 
+//Usuários com perfil INVESTIDOR são criados automaticamente com uma carteira.
+// Por isso, ao tentar excluir um investidor que possui registros vinculados 
+// na tabela 'carteira', o banco lança uma exceção de integridade referencial 
+// (SQLIntegrityConstraintViolationException) em 06 e 07.
+//
 // 
 /* ---------------------------------------------------------------------------- */
 
@@ -36,7 +43,7 @@ public class UsuarioDAO {
 
     
     
-    /*--- Inserir Usuários -----------------------------------------------------*/
+    /* 01) --- Inserir Usuários -----------------------------------------------------*/
     public void salvar(Usuario usuario) {
         String sql = "INSERT INTO usuarios (nome, email, senha, cpf, perfil) VALUES (?, ?, MD5(?), ?, ?)";
 
@@ -68,7 +75,7 @@ public class UsuarioDAO {
     
     
 
-    /*--- Criação automática da carteira do investidor quando o usuário é criado ---*/
+    /* 02)--- Criação automática da carteira do investidor quando o usuário é criado ---*/
     private void criarCarteiraParaInvestidor(int idInvestidor, Connection conn) {
         String sql = "INSERT INTO carteira (id_investidor, saldo) VALUES (?, 0.00)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -83,7 +90,7 @@ public class UsuarioDAO {
     
     
     
-    /*--- Listar todos os usuários ---------------------------------------------*/
+    /* 03) --- Listar todos os usuários ---------------------------------------------*/
     public ArrayList<Usuario> buscarTodos() {
         ArrayList<Usuario> usuarios = new ArrayList<>();
         String sql = "SELECT * FROM usuarios";
@@ -119,7 +126,7 @@ public class UsuarioDAO {
     
     
     
-    /*--- Listar por CPF -------------------------------------------------------*/
+    /* 04) --- Listar por CPF -------------------------------------------------------*/
     public Usuario buscarPorCpf(String cpf) {
 
         String sql = "SELECT * FROM usuarios WHERE cpf = ?";
@@ -164,7 +171,7 @@ public class UsuarioDAO {
     
     
     
-    /*--- Editar usuários pelo ID ----------------------------------------------*/
+    /* 05) --- Editar usuários pelo ID ----------------------------------------------*/
     public void editar(Usuario usuario) throws SQLException {
 
         String sql = "UPDATE usuarios SET nome = ?, email = ?, senha = ?, perfil = ? WHERE cpf = ?";
@@ -184,40 +191,53 @@ public class UsuarioDAO {
     
     
     
-    /*--- Deletar usuários pelo ID ---------------------------------------------*/
-    public void deletar(int id) {
-        String sql = "DELETE FROM usuarios WHERE id = ?";
+    /* 06) --- Deletar usuários pelo ID ---------------------------------------------*/
+public void deletar(int id) throws Exception {
+    String sql = "DELETE FROM usuarios WHERE id = ?";
 
-        try (Connection conn = ConnectionFactory.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+    try (Connection conn = ConnectionFactory.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, id);
+        stmt.setInt(1, id);
+
+        try {
             stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            logErro("Erro ao deletar usuário", e);
-            throw new RuntimeException("Não foi possível excluir o usuário.");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            // Tratamento específico para chave estrangeira
+            throw new Exception("Usuário não pode ser excluído porque possui vínculos ativos!");
         }
+
+    } catch (SQLException e) {
+        logErro("Erro ao deletar usuário", e);
+        throw new Exception("Erro técnico ao excluir usuário: " + e.getMessage());
     }
-    /*--------------------------------------------------------------------------*/
+}
+
 
 
     
-    
+/* 07) --- Deletar usuários pelo CPF --------------------------------------------*/
+public void deletarPorCpf(String cpf) throws Exception {
+    String sql = "DELETE FROM usuarios WHERE cpf = ?";
 
-    /*--- Deletar usuários pelo CPF --------------------------------------------*/
-    public void deletarPorCpf(String cpf) {
-        String sql = "DELETE FROM usuarios WHERE cpf = ?";
-        try (Connection conn = ConnectionFactory.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+    try (Connection conn = ConnectionFactory.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, cpf);
+        stmt.setString(1, cpf);
+
+        try {
             stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            logErro("Erro ao deletar usuário", e);
-            throw new RuntimeException("Não foi possível excluir o usuário.");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            // Tratamento específico para chave estrangeira
+            throw new Exception("Usuário não pode ser excluído porque possui vínculos ativos!");
         }
+
+    } catch (SQLException e) {
+        logErro("Erro ao deletar usuário", e);
+        throw new Exception("Erro técnico ao excluir usuário: " + e.getMessage());
     }
-    /*--------------------------------------------------------------------------*/
+}
+
     
 
     
